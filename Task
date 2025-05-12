@@ -1,0 +1,90 @@
+import java.time.LocalDate;
+
+public class Task {
+    private final String id;
+    private String title;
+    private String description;
+    private LocalDate dueDate;
+    private int priority;
+    private TaskStatus status;
+    private User assignedUser;
+
+    public Task(String id,String title,String description,LocalDate dueDate,int priority,User user){
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.dueDate = dueDate;
+        this.priority = priority;
+        status = TaskStatus.PENDING;
+        assignedUser = user;
+    }
+
+    public void markAsInProgress(){
+        status = TaskStatus.IN_PROGRESS;
+    }
+
+    public void markAsCompleted(){
+        status = TaskStatus.COMPLETED;
+    }
+
+    public void showTask(){
+        System.out.println("Id             :" + id);
+        System.out.println("Title          :" + title);
+        System.out.println("Description    :" + description);
+        System.out.println("Due date       :" + dueDate);
+        System.out.println("Priority       :" + priority);
+        System.out.println("Task status    :" + status);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setStatus(TaskStatus status) {
+        this.status = status;
+    }
+
+    public TaskStatus getStatus() {
+        return status;
+    }
+
+    public void setAssignedUser(User assignedUser) {
+        this.assignedUser = assignedUser;
+    }
+
+    public User getAssignedUser() {
+        return assignedUser;
+    }
+}
