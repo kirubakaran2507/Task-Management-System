@@ -1,0 +1,129 @@
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class TaskManagementSystemImpl implements TaskManagementSystem{
+    private static TaskManagementSystemImpl instance;
+    private final Map<String,Task> tasks;
+    private final Map<String, List<Task>> userTasks;
+
+    private TaskManagementSystemImpl(){
+        tasks = new ConcurrentHashMap<>();
+        userTasks = new ConcurrentHashMap<>();
+    }
+
+    public static TaskManagementSystemImpl getInstance(){
+        if (instance==null){
+            instance = new TaskManagementSystemImpl();
+        }
+        return instance;
+    }
+
+
+    @Override
+    public void createTask(Task task) {
+        tasks.put(task.getId(),task);
+        assignTaskToUser(task.getAssignedUser(),task);
+    }
+
+    @Override
+    public void updateTask(Task updatedTask) {
+        Task existingTask = tasks.get(updatedTask.getId());
+
+        existingTask.setTitle(updatedTask.getTitle());
+        existingTask.setDescription(updatedTask.getDescription());
+        existingTask.setDueDate(updatedTask.getDueDate());
+        existingTask.setPriority(updatedTask.getPriority());
+        existingTask.setStatus(updatedTask.getStatus());
+
+        User previousUser = existingTask.getAssignedUser();
+        User newUser = existingTask.getAssignedUser();
+
+        if (!previousUser.equals(newUser)){
+            unAssignTaskFromUser(previousUser,existingTask);
+            assignTaskToUser(newUser,existingTask);
+            existingTask.setAssignedUser(newUser);
+        }
+    }
+
+    @Override
+    public void deleteTask(String taskId) {
+        Task task = tasks.remove(taskId);
+        if (task!=null) {
+            unAssignTaskFromUser(task.getAssignedUser(), task);
+        }
+    }
+
+    @Override
+    public List<Task> searchTask(String keyword) {
+        List<Task> relatedTasks = new ArrayList<>();
+
+        for (Task task : tasks.values()){
+            if (task.getTitle().contains(keyword) || task.getDescription().contains(keyword)){
+                relatedTasks.add(task);
+            }
+        }
+        return relatedTasks;
+    }
+
+    @Override
+    public List<Task> filterTask(TaskStatus status, LocalDate startDate, LocalDate endDate, int priority) {
+        List<Task> filteredTasks = new ArrayList<>();
+
+        for (Task task : tasks.values()){
+            if (task.getStatus()==status && task.getDueDate().isAfter(startDate) && task.getDueDate().isBefore(endDate)
+            && task.getPriority()==priority){
+                filteredTasks.add(task);
+            }
+        }
+
+        return filteredTasks;
+    }
+
+    @Override
+    public void markTaskAsInProgress(String taskId, User user) {
+        Task task = tasks.get(taskId);
+        if (task!=null && task.getAssignedUser().equals(user)) {
+            task.markAsInProgress();
+        }
+    }
+
+    @Override
+    public void markTaskAsCompleted(String taskId, User user) {
+        Task task = tasks.get(taskId);
+        if (task!=null && task.getAssignedUser().equals(user)){
+            task.markAsCompleted();
+        }
+    }
+
+    @Override
+    public void showTaskHistory(User user) {
+        List<Task> tasks = getTaskHistory(user);
+
+        for (Task task : tasks){
+            task.showTask();
+        }
+    }
+
+    @Override
+    public List<Task> getTaskHistory(User user) {
+        return userTasks.get(user.getId());
+    }
+
+    @Override
+    public void assignTaskToUser(User user, Task task) {
+        List<Task> tasks = userTasks.getOrDefault(user.getId(),new ArrayList<>());
+        tasks.add(task);
+        userTasks.put(user.getId(), tasks);
+    }
+
+    @Override
+    public void unAssignTaskFromUser(User user, Task task) {
+        List<Task> tasks = userTasks.get(user.getId());
+        if (!tasks.isEmpty()){
+            tasks.remove(task);
+        }
+    }
+}
