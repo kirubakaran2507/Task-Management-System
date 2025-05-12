@@ -1,0 +1,94 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        TaskManagementSystemImpl taskManager = TaskManagementSystemImpl.getInstance();
+
+        // Create users
+        User user1 = new User("1", "John Doe", "john@example.com");
+        User user2 = new User("2", "Jane Smith", "jane@example.com");
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        // Create tasks
+        Task task1 = new Task("1", "Task 1", "Description 1",LocalDate.parse("2025-03-10",formatter), 1, user1);
+        Task task2 = new Task("2", "Task 2", "Description 2",LocalDate.parse("2025-03-20",formatter), 2, user2);
+        Task task3 = new Task("3", "Task 3", "Description 3",LocalDate.parse("2025-03-25",formatter), 1, user1);
+
+        // Add tasks to the task manager
+        taskManager.createTask(task1);
+        taskManager.createTask(task2);
+        taskManager.createTask(task3);
+
+        // Update a task
+        task2.setDescription("Updated description");
+        taskManager.updateTask(task2);
+
+        // Search tasks
+        List<Task> searchResults = taskManager.searchTask("Task");
+        System.out.println("Search Results:");
+        for (Task task : searchResults) {
+            System.out.println(task.getTitle());
+        }
+
+        // Filter tasks
+        List<Task> filteredTasks = taskManager.filterTask(TaskStatus.PENDING, LocalDate.parse("2025-03-01"), LocalDate.parse("2025-03-26"), 1);
+        System.out.println("Filtered Tasks:");
+        for (Task task : filteredTasks) {
+            System.out.println(task.getTitle());
+        }
+
+        // Mark a task as completed
+        taskManager.markTaskAsCompleted("1",user1);
+
+        filteredTasks = taskManager.filterTask(TaskStatus.COMPLETED, LocalDate.parse("2025-03-01"), LocalDate.parse("2025-03-21"), 1);
+        System.out.println("Filtered Tasks:");
+        for (Task task : filteredTasks) {
+            System.out.println(task.getTitle());
+        }
+        // Get task history for a user
+        List<Task> taskHistory = taskManager.getTaskHistory(user1);
+        System.out.println("Task History for " + user1.getName() + ":");
+        for (Task task : taskHistory) {
+            System.out.println(task.getTitle());
+        }
+
+
+         taskHistory = taskManager.getTaskHistory(user1);
+        System.out.println("Task History for " + user1.getName() + ":");
+        for (Task task : taskHistory) {
+            System.out.println(task.getTitle());
+        }
+
+        filteredTasks = taskManager.filterTask(TaskStatus.IN_PROGRESS, LocalDate.parse("2025-03-01"), LocalDate.parse("2025-03-30"), 1);
+        System.out.println("Filtered Tasks:");
+        for (Task task : filteredTasks) {
+            System.out.println(task.getTitle());
+        }
+
+        taskManager.markTaskAsInProgress("3",user1);
+
+        filteredTasks = taskManager.filterTask(TaskStatus.IN_PROGRESS, LocalDate.parse("2025-03-01"), LocalDate.parse("2025-03-30"), 1);
+        System.out.println("Filtered Tasks:");
+        for (Task task : filteredTasks) {
+            System.out.println(task.getTitle());
+        }
+
+        // Delete a task
+        taskManager.deleteTask("3");
+
+        filteredTasks = taskManager.filterTask(TaskStatus.IN_PROGRESS, LocalDate.parse("2025-03-01"), LocalDate.parse("2025-03-30"), 1);
+        System.out.println("Filtered Tasks:");
+        for (Task task : filteredTasks) {
+            System.out.println(task.getTitle());
+        }
+
+        taskManager.showTaskHistory(user1);
+    }
+
+    private static String generateUUID(){
+        return UUID.randomUUID().toString().substring(0,8);
+    }
+}
