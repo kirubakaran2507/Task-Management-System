@@ -1,0 +1,16 @@
+import java.time.LocalDate;
+import java.util.List;
+
+public interface TaskManagementSystem {
+    void createTask(Task task);
+    void updateTask(Task updatedTask);
+    void deleteTask(String taskId);
+    List<Task> searchTask(String keyword);
+    List<Task> filterTask(TaskStatus status, LocalDate startDate,LocalDate endDate,int priority);
+    void markTaskAsInProgress(String taskId,User user);
+    void markTaskAsCompleted(String taskId,User user);
+    void showTaskHistory(User user);
+    List<Task> getTaskHistory(User user);
+    void assignTaskToUser(User user,Task task);
+    void unAssignTaskFromUser(User user,Task task);
+}
